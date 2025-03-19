@@ -97,9 +97,9 @@ python app/main.py
 - **Millicent Cheptoi** - [GitHub](https://github.com/Cheptoi-Millicent)
 - **Caroline Woto** - [GitHub](https://github.com/CWoto)
 - **Reagan SAF** - [GitHub](https://github.com/iDeal-DataViz)
-- **Your Name** - [GitHub](https://github.com/yourusername)
-- **Your Name** - [GitHub](https://github.com/yourusername)
-- **Your Name** - [GitHub](https://github.com/yourusername)
+- **Mercy Ayub** - [GitHub](https://github.com/mercy-gh)
+- **Daniel Kithinji** - [GitHub](https://github.com/DanielKithinji)
+- **Jesse Gitobu** - [GitHub](https://github.com/JesseGitobu)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
