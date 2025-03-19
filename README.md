@@ -94,6 +94,11 @@ python app/main.py
 - Integrate real-time data streams
 
 ## Contributors
+- **Millicent Cheptoi** - [GitHub](https://github.com/Cheptoi-Millicent)
+- **Caroline Woto** - [GitHub](https://github.com/CWoto)
+- **Reagan SAF** - [GitHub](https://github.com/iDeal-DataViz)
+- **Your Name** - [GitHub](https://github.com/yourusername)
+- **Your Name** - [GitHub](https://github.com/yourusername)
 - **Your Name** - [GitHub](https://github.com/yourusername)
 
 ## License
