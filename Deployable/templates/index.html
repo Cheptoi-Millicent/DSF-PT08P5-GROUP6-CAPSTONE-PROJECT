@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loan Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Loan Prediction</h1>
+
+    {% if error %}
+        <p class="error">Error: {{ error }}</p>
+    {% endif %}
+
+    <form method="post">
+        <div class="form-group">
+            <label for="occupation_category">Occupation Category:</label>
+            <select name="occupation_category" id="occupation_category">
+                {% for key, value in occupation_categories.items() %}
+                    <option value="{{ value }}" {% if occupation_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" value="{{ age }}">
+        </div>
+
+        <div class="form-group">
+            <label for="loan_term">Loan Term:</label>
+            <input type="number" id="loan_term" name="loan_term" value="{{ loan_term }}">
+        </div>
+
+        <div class="form-group">
+            <label for="employment_status">Employment Status:</label>
+            <select name="employment_status" id="employment_status">
+                {% for key, value in employment_status_categories.items() %}
+                    <option value="{{ value }}" {% if employment_status_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="business_industry">Business Industry:</label>
+            <select name="business_industry" id="business_industry">
+                {% for key, value in business_industry_categories.items() %}
+                    <option value="{{ value }}" {% if business_industry_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="monthly_income">Monthly Income:</label>
+            <input type="number" id="monthly_income" name="monthly_income" value="{{ monthly_income }}">
+        </div>
+
+        <div class="form-group">
+            <label for="crb_score">CRB Score:</label>
+            <input type="number" id="crb_score" name="crb_score" value="{{ crb_score }}">
+        </div>
+
+        <div class="form-group">
+            <label for="loan_purpose">Loan Purpose:</label>
+            <select name="loan_purpose" id="loan_purpose">
+                {% for key, value in loan_purpose_categories.items() %}
+                    <option value="{{ value }}" {% if loan_purpose_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="total_loan_amount">Total Loan Amount:</label>
+            <input type="number" id="total_loan_amount" name="total_loan_amount" value="{{ total_loan_amount }}">
+        </div>
+
+        <div class="form-group">
+            <label for="employment_length">Employment Length (Months):</label>
+            <input type="number" id="employment_length" name="employment_length" value="{{ employment_length }}">
+        </div>
+
+        <div class="form-group">
+            <label for="crb_grade">CRB Grade:</label>
+            <select name="crb_grade" id="crb_grade">
+                {% for key, value in crb_grade_categories.items() %}
+                    <option value="{{ value }}" {% if crb_grade_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction_text is not none %}
+        <p>Prediction: {{ prediction_text }}</p>
+
+        <h3>Input Summary:</h3>
+        <p>Occupation Category: {{ occupation_name }}</p>
+        <p>Age: {{ age }}</p>
+        <p>Loan Term: {{ loan_term }}</p>
+        <p>Employment Status: {{ employment_status_name }}</p>
+        <p>Business Industry: {{ business_industry_name }}</p>
+        <p>Monthly Income: {{ monthly_income }}</p>
+        <p>CRB Score: {{ crb_score }}</p>
+        <p>Loan Purpose: {{ loan_purpose_name }}</p>
+        <p>Total Loan Amount: {{ total_loan_amount }}</p>
+        <p>Employment Length (Months): {{ employment_length }}</p>
+        <p>CRB Grade: {{ crb_grade_name }}</p>
+    {% endif %}
+</body>
+</html>
