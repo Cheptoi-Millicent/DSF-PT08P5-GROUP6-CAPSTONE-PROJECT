@@ -1,72 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Loan Default Prediction</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        form { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
-        label, select, input { display: block; margin-bottom: 10px; width: 100%; padding: 8px; }
-        button { background-color: #28a745; color: white; padding: 10px; border: none; cursor: pointer; }
-    </style>
+    <meta charset="UTF-8">
+    <title>Loan Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h2>Loan Default Prediction</h2>
-    <form method="POST">
-        <label>Occupation Category:</label>
-        <select name="Occupation_Professional_Category">
-            {% for category in occupation_categories %}
-            <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-        </select>
+    <h1>Loan Prediction</h1>
 
-        <label>Number of Days in Debit:</label>
-        <input type="number" name="Number_of_Days_in_Debit" required>
+    {% if error %}
+        <p class="error">Error: {{ error }}</p>
+    {% endif %}
 
-        <label>Gender:</label>
-        <select name="Gender">
-            {% for gender in gender_options %}
-            <option value="{{ gender }}">{{ gender }}</option>
-            {% endfor %}
-        </select>
+    <form method="post">
+        <div class="form-group">
+            <label for="occupation_category">Occupation Category:</label>
+            <select name="occupation_category" id="occupation_category">
+                {% for key, value in occupation_categories.items() %}
+                    <option value="{{ value }}" {% if occupation_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <label>Own or Rent Home:</label>
-        <input type="text" name="Own_Rent_Home" required>
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" value="{{ age }}">
+        </div>
 
-        <label>Type of Business Industry:</label>
-        <select name="Type_of_Business_Industry_of_Employment">
-            {% for industry in business_industries %}
-            <option value="{{ industry }}">{{ industry }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <label for="loan_term">Loan Term:</label>
+            <input type="number" id="loan_term" name="loan_term" value="{{ loan_term }}">
+        </div>
 
-        <label>CRB Score:</label>
-        <input type="number" name="CRB_Score" required>
+        <div class="form-group">
+            <label for="employment_status">Employment Status:</label>
+            <select name="employment_status" id="employment_status">
+                {% for key, value in employment_status_categories.items() %}
+                    <option value="{{ value }}" {% if employment_status_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <label>Monthly Income:</label>
-        <input type="number" name="Monthly_Income" required>
+        <div class="form-group">
+            <label for="business_industry">Business Industry:</label>
+            <select name="business_industry" id="business_industry">
+                {% for key, value in business_industry_categories.items() %}
+                    <option value="{{ value }}" {% if business_industry_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <label>Account Type:</label>
-        <select name="Account_Type">
-            {% for acc in account_types %}
-            <option value="{{ acc }}">{{ acc }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <label for="monthly_income">Monthly Income:</label>
+            <input type="number" id="monthly_income" name="monthly_income" value="{{ monthly_income }}">
+        </div>
 
-        <label>Loan Purpose:</label>
-        <select name="Loan_Purpose">
-            {% for purpose in loan_purposes %}
-            <option value="{{ purpose }}">{{ purpose }}</option>
-            {% endfor %}
-        </select>
+        <div class="form-group">
+            <label for="crb_score">CRB Score:</label>
+            <input type="number" id="crb_score" name="crb_score" value="{{ crb_score }}">
+        </div>
 
-        <label>Loan Term (Months):</label>
-        <input type="number" name="Loan_Term" required>
+        <div class="form-group">
+            <label for="loan_purpose">Loan Purpose:</label>
+            <select name="loan_purpose" id="loan_purpose">
+                {% for key, value in loan_purpose_categories.items() %}
+                    <option value="{{ value }}" {% if loan_purpose_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="total_loan_amount">Total Loan Amount:</label>
+            <input type="number" id="total_loan_amount" name="total_loan_amount" value="{{ total_loan_amount }}">
+        </div>
+
+        <div class="form-group">
+            <label for="employment_length">Employment Length (Months):</label>
+            <input type="number" id="employment_length" name="employment_length" value="{{ employment_length }}">
+        </div>
+
+        <div class="form-group">
+            <label for="crb_grade">CRB Grade:</label>
+            <select name="crb_grade" id="crb_grade">
+                {% for key, value in crb_grade_categories.items() %}
+                    <option value="{{ value }}" {% if crb_grade_name == key %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
         <button type="submit">Predict</button>
     </form>
 
-    {% if result %}
-        <h3>Prediction: {{ result }}</h3>
+    {% if prediction_text is not none %}
+        <p>Prediction: {{ prediction_text }}</p>
+
+        <h3>Input Summary:</h3>
+        <p>Occupation Category: {{ occupation_name }}</p>
+        <p>Age: {{ age }}</p>
+        <p>Loan Term: {{ loan_term }}</p>
+        <p>Employment Status: {{ employment_status_name }}</p>
+        <p>Business Industry: {{ business_industry_name }}</p>
+        <p>Monthly Income: {{ monthly_income }}</p>
+        <p>CRB Score: {{ crb_score }}</p>
+        <p>Loan Purpose: {{ loan_purpose_name }}</p>
+        <p>Total Loan Amount: {{ total_loan_amount }}</p>
+        <p>Employment Length (Months): {{ employment_length }}</p>
+        <p>CRB Grade: {{ crb_grade_name }}</p>
     {% endif %}
 </body>
 </html>

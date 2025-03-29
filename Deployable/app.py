@@ -1,108 +1,158 @@
-from flask import Flask, render_template, request, jsonify
-import joblib
-import numpy as np
+from flask import Flask, render_template, request
 import pandas as pd
+import joblib  # Import joblib for loading
 
 app = Flask(__name__)
 
-# Load the trained model
-# model = joblib.load("models/random_forest_model.pkl")
-preprocessor = joblib.load("models/preprocessor.pkl")
+# Load the trained pipeline
+model_pipeline = joblib.load("models/random_forest_model.pkl")
 
-# Dropdown options
-occupation_categories = ["Employed", "Self-Employed", "Unemployed", "Student"]
-business_industries = ["Finance", "Healthcare", "Education", "Technology", "Retail", "Other"]
-employment_status_options = ["Full-Time", "Part-Time", "Unemployed", "Retired"]
-loan_purposes = ["Personal", "Business", "Education", "Medical", "Other"]
-account_types = ["Savings", "Checking", "Current"]
-crb_grades = ["A", "B", "C", "D", "E"]
-marital_status_options = ["Single", "Married", "Divorced", "Widowed"]
-gender_options = ["Male", "Female", "Other"]
+# Define your category mappings
+occupation_categories = {
+    'unknown': 0, 'Employee': 1, 'Clerical Support Worker': 2,
+    'Professional': 3, 'Officer': 4, 'Semi-Professional': 5,
+    'Service and Sales Worker': 6, 'Plant and Machine Operators': 7,
+    'Armed Forces Occupation': 8, 'Elementary Occupation': 9,
+    'Technician and Associate Professional': 10, 'Self Employed': 11,
+    'Blue Collar': 12, 'Skilled Agricultural, Forestry': 13, 'Pensioner': 14
+}
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
+employment_status_categories = {
+    'unknown': 0, 'Retired': 1, 'Part-Time': 2, 'Contract': 3,
+    'Self Employed': 4, 'Full-Time': 5
+}
+
+crb_grade_categories = {'X': 0, 'E': 1, 'D': 2, 'C': 3, 'B': 4, 'A': 5}
+
+loan_purpose_categories = {
+    'unknown': 0, 'Other': 1, 'Education': 2,
+    'Home Improvement': 3, 'Debt Consolidation': 4
+}
+
+business_industry_categories = {
+    'Unknown': 0, 'Financial': 1, 'Civil Service': 2, 'Tourism': 3,
+    'Education': 4, 'Energy, Electricity & Water': 5, 'Private Security Services': 6,
+    'Manufacturing': 7, 'Mining & Quarrying': 8, 'Retailing': 9,
+    'Construction & Installation': 10, 'Transportation & Communication': 11,
+    'Micro & Small Enterprise': 12, 'Science & Technology': 13,
+    'Business Process Outsourcing': 14, 'Professional & Other Services': 15,
+    'Environment & Sustainable Dev.': 16, 'Agriculture': 17, 'Distribution': 18,
+    'Retiree/Pensioner': 19, 'Other': 20
+}
+
+# Create inverse mappings for displaying category names
+occupation_categories_inverse = {v: k for k, v in occupation_categories.items()}
+employment_status_categories_inverse = {v: k for k, v in employment_status_categories.items()}
+crb_grade_categories_inverse = {v: k for k, v in crb_grade_categories.items()}
+loan_purpose_categories_inverse = {v: k for k, v in loan_purpose_categories.items()}
+business_industry_categories_inverse = {v: k for k, v in business_industry_categories.items()}
+
+
+@app.route('/', methods=['GET', 'POST'])
+def predict():
+    if request.method == 'POST':
         try:
-            # Get form data
-            form_data = request.form
+            # Get data from the form, handling potential errors
+            occupation_category = int(request.form['occupation_category'])
+            age = int(request.form['age'])
+            loan_term = int(request.form['loan_term'])
+            employment_status = int(request.form['employment_status'])
+            business_industry = int(request.form['business_industry'])
+            monthly_income = int(request.form['monthly_income'])
+            crb_score = int(request.form['crb_score'])
+            loan_purpose = int(request.form['loan_purpose'])
+            total_loan_amount = int(request.form['total_loan_amount'])
+            employment_length = int(request.form['employment_length'])
+            crb_grade = int(request.form['crb_grade'])
 
-            # Convert input data into correct format
-            input_data = [
-                form_data["Occupation_Professional_Category"],
-                int(form_data["Number_of_Days_in_Debit"]),
-                form_data["Gender"],
-                form_data["Own_Rent_Home"],
-                form_data["Type_of_Business_Industry_of_Employment"],
-                int(form_data["Key"]),
-                int(form_data["CRB_Score"]),
-                int(form_data["Time_at_Current_Employment"]),
-                int(form_data["Number_of_Cheque_Debit_Transactions"]),
-                int(form_data["Number_of_ATM_Deposits"]),
-                int(form_data["Age_at_Application"]),
-                int(form_data["Number_of_Dependents"]),
-                int(form_data["Number_of_Over_the_Counter_withdrawals"]),
-                float(form_data["Monthly_Income"]),
-                float(form_data["Minimum_End_of_Day_Balance"]),
-                float(form_data["Average_Balance"]),
-                float(form_data["Sum_of_Monthly_Debit_Transactions"]),
-                float(form_data["Sum_of_Monthly_Credit_Transactions"]),
-                int(form_data["Number_of_Debit_Card_POS_Transactions"]),
-                float(form_data["Maximum_End_of_Day_Balance"]),
-                int(form_data["Government_Employee"]),
-                form_data["Account_Type"],
-                form_data["CRB_Grade"],
-                form_data["Loan_Purpose"],
-                int(form_data["Number_of_ATM_Withdrawals"]),
-                form_data["Marital_Status"],
-                float(form_data["Total_Loan_Amount"]),
-                int(form_data["Number_of_Days_in_Credit"]),
-                int(form_data["Number_of_Joint_Holders"]),
-                int(form_data["Loan_Term"]),
-                form_data["Employment_Status"],
-                float(form_data["Overdraft_Limit"]),
-                int(form_data["Number_of_Bounced_Cheques"]),
+
+
+            # Create a DataFrame from the input data
+            new_data = pd.DataFrame({
+                'Occupation_Professional_Category': [occupation_category],
+                'Age_at_Application': [age],
+                'Loan_Term': [loan_term],
+                'Employment_Status': [employment_status],
+                'Type_of_Business_Industry_of_Employment': [business_industry],
+                'Monthly_Income': [monthly_income],
+                'CRB Score': [crb_score],
+                'Loan_Purpose': [loan_purpose],
+                'Total_Loan_Amount': [total_loan_amount],
+                'Time_at_Current_Employment_(Months)': [employment_length],
+                'CRB Grade': [crb_grade]
+            })
+
+            # Ensure column names match your training data exactly (this is redundant, but good practice)
+            new_data.columns = [
+                'Occupation_Professional_Category',
+                'Age_at_Application',
+                'Loan_Term',
+                'Employment_Status',
+                'Type_of_Business_Industry_of_Employment',
+                'Monthly_Income',
+                'CRB Score',
+                'Loan_Purpose',
+                'Total_Loan_Amount',
+                'Time_at_Current_Employment_(Months)',
+                'CRB Grade'
             ]
 
-            # Convert categorical variables to numerical values if necessary
-            # (You need to ensure that your model was trained with encoded categorical values)
 
-            # # Convert to numpy array
-            # input_array = np.array(input_data).reshape(1, -1)
+            # Make the prediction
+            
+            predicted_class = model_pipeline.predict(new_data)[0]  # Access the first element of the array
+
+            # Translate prediction to "Default" or "No Default"
+            prediction_text = "Default" if predicted_class == 1 else "No Default"
 
 
-            # # Make prediction
-            # prediction = model.predict(input_array)[0]
-            # Convert to DataFrame
-            input_df = pd.DataFrame([input_data])
+            # Convert numerical values back to category names for display
+            occupation_name = occupation_categories_inverse.get(occupation_category, 'Unknown') #Handles out-of-range values
+            employment_status_name = employment_status_categories_inverse.get(employment_status, 'Unknown')
+            crb_grade_name = crb_grade_categories_inverse.get(crb_grade, 'Unknown')
+            loan_purpose_name = loan_purpose_categories_inverse.get(loan_purpose, 'Unknown')
+            business_industry_name = business_industry_categories_inverse.get(business_industry, 'Unknown')
 
-            # Ensure column order
-            input_df = input_df[preprocessor.feature_names_in_]
 
-            # Preprocess input
-            processed_input = preprocessor.transform(input_df)
+            # Return the prediction to the template
+            return render_template('index.html',
+                                   
+                                   prediction_text=prediction_text, #Pass the translated text
+                                   occupation_name=occupation_name,
+                                   age=age,
+                                   loan_term=loan_term,
+                                   employment_status_name=employment_status_name,
+                                   business_industry_name=business_industry_name,
+                                   monthly_income=monthly_income,
+                                   crb_score=crb_score,
+                                   loan_purpose_name=loan_purpose_name,
+                                   total_loan_amount=total_loan_amount,
+                                   employment_length=employment_length,
+                                   crb_grade_name=crb_grade_name,
+                                   occupation_categories=occupation_categories,
+                                   employment_status_categories=employment_status_categories,
+                                   crb_grade_categories=crb_grade_categories,
+                                   loan_purpose_categories=loan_purpose_categories,
+                                   business_industry_categories=business_industry_categories)
 
-            # Predict
-            prediction = model.predict(processed_input)
-
-            # Convert prediction to human-readable format
-            result = "Default" if prediction == 1 else "No Default"
-
-            return render_template("index.html", result=result)
 
         except Exception as e:
-            return render_template("index.html", result="Error: " + str(e))
+            return render_template('index.html', error=str(e),
+                                   occupation_categories=occupation_categories,
+                                   employment_status_categories=employment_status_categories,
+                                   crb_grade_categories=crb_grade_categories,
+                                   loan_purpose_categories=loan_purpose_categories,
+                                   business_industry_categories=business_industry_categories)
 
-    return render_template(
-        "index.html",
-        occupation_categories=occupation_categories,
-        business_industries=business_industries,
-        employment_status_options=employment_status_options,
-        loan_purposes=loan_purposes,
-        account_types=account_types,
-        crb_grades=crb_grades,
-        marital_status_options=marital_status_options,
-        gender_options=gender_options,
-    )
 
-if __name__ == "__main__":
+    # If it's a GET request, just render the form
+    return render_template('index.html',
+                           occupation_categories=occupation_categories,
+                           employment_status_categories=employment_status_categories,
+                           crb_grade_categories=crb_grade_categories,
+                           loan_purpose_categories=loan_purpose_categories,
+                           business_industry_categories=business_industry_categories)
+
+
+if __name__ == '__main__':
     app.run(debug=True)

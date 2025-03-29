@@ -1,0 +1,9 @@
+name: loan_default_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy=1.23.5
+  - scikit-learn=1.2.2
+  - joblib
+  - flask
