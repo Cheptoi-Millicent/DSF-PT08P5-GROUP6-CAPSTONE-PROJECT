@@ -8,11 +8,11 @@ Loan default prediction is a crucial task for financial institutions to assess c
 ```
 Loan-Default-Prediction/
 │-- data/                  # Contains raw and processed datasets
-│-- notebooks/             # Jupyter notebooks for exploratory data analysis (EDA) and modeling
-│-- app/                   # Flask/FastAPI application for deployment
+│-- Index.ipynb            # Jupyter notebook for exploratory data analysis (EDA) and modeling
+│-- Deployable/            # Flask/FastAPI application for deployment
 │-- README.md              # Project documentation
-│-- requirements.txt       # Python dependencies
-│-- config.yaml            # Configuration file
+│-- Group 6 Proposal _Loan Default Prediction.docx
+│-- Loan Default Prediction Model.docx
 ```
 
 ## Business Problem
@@ -28,14 +28,22 @@ The dataset comprises multiple sources:
 - **Application Data:** Demographics, employment details, and loan purpose.
 - **Contract Data:** Loan amount, tenure, and type.
 - **CRB Data:** Credit scores and risk grades.
-- **Transaction Data:** Bank account balances, overdraft limits, and bounced cheques.
-- **Repayment Data:** Loan repayment behavior, outstanding amounts, and due payments.
+- **ContractsSnapshotData** Monthly data of the loan status
+- **Current and Savings Account Data** - Current and Savings information of the loan applicants
 
 ## Features Used
-- **Demographics:** Age, marital status, employment status, dependents.
-- **Loan Information:** Loan amount, tenure, purpose, type.
-- **Credit History:** CRB score, past loan repayment behavior.
-- **Bank Transactions:** Average balance, Monthly_Income, bounced cheques.
+After data cleaning, we utilized the following features for prediction:
+- **Occupation_Professional_Category**
+- **Age_at_Application**
+- **Loan_Term**
+- **Employment_Status**
+- **Type_of_Business_Industry_of_Employment**
+- **Monthly_Income**
+- **CRB Score**
+- **Loan_Purpose**
+- **Total_Loan_Amount**
+- **Time_at_Current_Employment_(Months)**
+- **CRB Grade**
 
 ## Methodology
 1. **Data Collection & Cleaning** – Merging multiple datasets, handling missing values, and feature engineering.
@@ -50,51 +58,54 @@ The dataset comprises multiple sources:
 - Python 3.8+
 - Jupyter Notebook
 - Flask or FastAPI (for deployment)
-- Pandas, NumPy, Scikit-learn, XGBoost, TensorFlow
-
+- Pandas, NumPy, Scikit-learn, XGBoost
 ### Setup
 ```sh
 # Clone the repository
-git clone https://github.com/yourusername/Loan-Default-Prediction.git
+git clone https://github.com/Cheptoi-Millicent/DSF-PT08P5-GROUP6-CAPSTONE-PROJECT.git
 cd Loan-Default-Prediction
 
 # Create a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+cd Deployable
+python -m venv Loan-env
+source Loan-env/bin/activate  # On Windows use `Loan-env\Scripts\activate`
 
-# Install dependencies
-pip install -r requirements.txt
-```
+
 
 ## Running the Project
 ### Exploratory Data Analysis and Train Model
 ```sh
-jupyter notebook notebooks/Index.ipynb
+jupyter notebook /Index.ipynb
 ```
-
 
 ### Run Web App
 ```sh
-python app/main.py
+python Deployable/main.py
 ```
 
 ## Model Performance
 | Metric    | Value |
 |-----------|-------|
-| Accuracy  | 85%   |
-| Precision | 82%   |
-| Recall    | 88%   |
-| F1-Score  | 85%   |
-| ROC-AUC   | 91%   |
+| Accuracy  | 95%   |
+| Precision | 47%   |
+| Recall    | 100%  |
+| F1-Score  | 64%   |
+
 
 ## Future Improvements
 - Improve feature selection and engineering
 - Experiment with deep learning models
 - Deploy on AWS/GCP for scalability
 - Integrate real-time data streams
+- Address class imbalance better
 
 ## Contributors
-- **Your Name** - [GitHub](https://github.com/yourusername)
+- **Mercy Ayub** - [GitHub](https://github.com/mercy-gh)
+- **Daniel Kithinji** - [GitHub](https://github.com/DanielKithinji)
+- **Carol Woto** - [GitHub](https://github.com/CWoto)
+- **Millicent Cheptoi** - [GitHub](https://github.com/Cheptoi-Millicent)
+- **Reagan SAF** - [GitHub](https://github.com/iDeal-DataViz)
+- **Jesse Gitobu** - [GitHub](https://github.com/JesseGitobu)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
